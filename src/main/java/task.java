@@ -1,4 +1,6 @@
-public class task {
+//abstract class for all tasks - todo, event, deadline
+
+public abstract class task {
     private boolean isDone;
     private String name;
 
@@ -17,5 +19,12 @@ public class task {
 
     public void setDone(boolean isDone) {
         this.isDone = isDone;
+    }
+
+    public abstract String getTypeIcon();
+
+    @Override
+    public String toString() {
+        return String.format("[%s][%s] %s", getTypeIcon(), doneString(), this.name);
     }
 }

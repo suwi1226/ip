@@ -1,46 +1,76 @@
 import java.util.Scanner;
 
 public class Bucket {
+    private static final String LINE_BREAK = "-------------------------";
+
     public static void main(String[] args) {
         String banner = " ____   _   _   ____  _  __ _____  _____ \n"
                 + "| __ ) | | | | / ___|| |/ /| ____||_   _|\n"
                 + "|  _ \\ | | | || |    | ' / |  _|    | |  \n"
                 + "| |_) || |_| || |___ | . \\ | |___   | |  \n"
                 + "|____/  \\___/  \\____||_|\\_\\|_____|  |_|  \n";
-        String lineBreak = "-------------------------";
         taskList items = new taskList();
 
-        System.out.println(lineBreak);
+        System.out.println(LINE_BREAK);
         System.out.println(banner);
         System.out.println("Hello! I'm Bucket\nYou again?");
-        System.out.println(lineBreak);
+        System.out.println(LINE_BREAK);
 
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
 
         while (!input.equalsIgnoreCase("bye")) {
-            if (input.startsWith("mark")) {
-                // Handle mark command
-                String[] parts = input.split(" ", 2);
-                String command = parts[0]; // "mark"
-                int taskNumber = Integer.parseInt(parts[1]) - 1;
+            // Split once only, so a description keeps any spaces inside it.
+            String[] parts = input.trim().split(" ", 2);
+            String command = parts[0]; //todo, event, deadline, mark, unmark, list (last resort)
+            String argument = parts.length > 1 ? parts[1] : ""; //the rest of the line, if any, is the argument
 
-                items.get(taskNumber).setDone(true);
+            if (command.equals("todo")) {
+                addTask(items, new todo(argument)); //argument is the description of the todo task
 
-            } 
-            
-            else {
-                //standard add
-                task item = new task(input);
-                items.addItem(item);
+            } else if (command.equals("deadline")) {
+                // "return book /by Sunday" -> ["return book", "Sunday"]
+                String[] detail = argument.split(" /by ", 2); //split into description and deadline
+                addTask(items, new deadline(detail[0], detail[1]));
+
+            } else if (command.equals("event")) {
+                // "project meeting /from Mon 2pm /to 4pm" -> description, then start, then end
+                String[] detail = argument.split(" /from ", 2); //spilts into description and the rest
+                String[] fromTo = detail[1].split(" /to ", 2); //splits the rest into start and end
+                addTask(items, new event(detail[0], fromTo[0], fromTo[1]));
+
+            } else if (command.equals("mark") || command.equals("unmark")) {
+                boolean isDone = command.equals("mark");
+                task t = items.get(Integer.parseInt(argument) - 1);
+                t.setDone(isDone);
+
+                System.out.println(LINE_BREAK);
+                System.out.println(isDone
+                        ? "Nice! I've marked this task as done:"
+                        : "OK, I've marked this task as not done yet:");
+                System.out.println("  " + t);
+                System.out.println(LINE_BREAK);
+
+            } else {
+                //list as a defulat if the command is not recognized
+                System.out.println(items);
             }
-            
-            System.out.println(items.toString());            
+
             input = scanner.nextLine();
         }
-        
+
         scanner.close();
         System.out.println("BYE!");
-        System.out.println(lineBreak);
+        System.out.println(LINE_BREAK);
+    }
+
+    /** Adds a task and prints the confirmation the Level-4 sample output asks for. */
+    private static void addTask(taskList items, task t) {
+        items.addItem(t);
+        System.out.println(LINE_BREAK);
+        System.out.println("Got it. I've added this task:");
+        System.out.println("    " + t);
+        System.out.println("Now you have " + items.size() + " tasks in the list.");
+        System.out.println(LINE_BREAK);
     }
 }
