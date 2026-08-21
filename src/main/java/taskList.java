@@ -7,6 +7,10 @@ public class taskList {
         items.add(item);
     }
 
+    public void removeItem(int index) {
+        items.remove(index);
+    }
+
     public task get(int index) {
         return items.get(index);
     }
