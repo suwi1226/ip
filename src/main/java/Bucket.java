@@ -26,7 +26,13 @@ public class Bucket {
             String argument = parts.length > 1 ? parts[1] : ""; //the rest of the line, if any, is the argument
 
             if (command.equals("todo")) {
-                addTask(items, new todo(argument)); //argument is the description of the todo task
+                if (argument.isEmpty()) {
+                    System.out.println(LINE_BREAK);
+                    System.out.println("OOPS!!! The description of a todo cannot be empty.");
+                    System.out.println(LINE_BREAK);
+                } else {
+                    addTask(items, new todo(argument));
+                }
 
             } else if (command.equals("deadline")) {
                 // "return book /by Sunday" -> ["return book", "Sunday"]
@@ -51,9 +57,12 @@ public class Bucket {
                 System.out.println("  " + t);
                 System.out.println(LINE_BREAK);
 
-            } else {
-                //list as a defulat if the command is not recognized
+            } else if (command.equals("list")) {
                 System.out.println(items);
+            } else {
+                System.out.println(LINE_BREAK);
+                System.out.println("OOPS!!! I'm sorry, but I don't know what that means :-(");
+                System.out.println(LINE_BREAK);
             }
 
             input = scanner.nextLine();
