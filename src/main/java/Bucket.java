@@ -8,8 +8,7 @@ public class Bucket {
                 + "| |_) || |_| || |___ | . \\ | |___   | |  \n"
                 + "|____/  \\___/  \\____||_|\\_\\|_____|  |_|  \n";
         String lineBreak = "-------------------------";
-        String[] items = new String[100];
-        int index = 0;
+        taskList items = new taskList();
 
         System.out.println(lineBreak);
         System.out.println(banner);
@@ -20,14 +19,23 @@ public class Bucket {
         String input = scanner.nextLine();
 
         while (!input.equalsIgnoreCase("bye")) {
-            items[index] = input;
-            index++;
+            if (input.startsWith("mark")) {
+                // Handle mark command
+                String[] parts = input.split(" ", 2);
+                String command = parts[0]; // "mark"
+                int taskNumber = Integer.parseInt(parts[1]) - 1;
 
-            System.out.println(lineBreak);
-            for (int i = 0; i < index; i++) {
-                System.out.println((i + 1) + ". " + items[i]);
+                items.get(taskNumber).setDone(true);
+
+            } 
+            
+            else {
+                //standard add
+                task item = new task(input);
+                items.addItem(item);
             }
-            System.out.println(lineBreak);
+            
+            System.out.println(items.toString());            
             input = scanner.nextLine();
         }
         
