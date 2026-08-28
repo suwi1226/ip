@@ -3,8 +3,10 @@ package bucket;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-//everything the user sees or types goes through here, so no other class needs System.out
-
+/**
+ * Handles everything the user sees or types, so no other class needs System.out.
+ * Keeping the printing in one place means every message is formatted the same way.
+ */
 public class Ui {
     private static final String LINE_BREAK = "-------------------------";
     private static final String BANNER = " ____   _   _   ____  _  __ _____  _____ \n"
@@ -15,21 +17,29 @@ public class Ui {
 
     private Scanner scanner;
 
-    //opens the input stream - call this before reading any commands.
-    //pairs with close() so the scanner's lifetime is obvious from Bucket
+    /**
+     * Opens the input stream. Call this before reading any commands.
+     * Pairs with close() so the scanner's lifetime is obvious from Bucket.
+     */
     public void start() {
         scanner = new Scanner(System.in);
     }
 
-    //reads the next line the user types
+    /**
+     * Reads the next line the user types.
+     *
+     * @return the raw line, before any parsing
+     */
     public String readCommand() {
         return scanner.nextLine();
     }
 
+    /** Closes the input stream. */
     public void close() {
         scanner.close();
     }
 
+    /** Prints the banner and greeting shown at startup. */
     public void showWelcome() {
         System.out.println(LINE_BREAK);
         System.out.println(BANNER);
@@ -37,7 +47,7 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
-    //small pause so it looks like it's actually doing something
+    /** Prints the loading message, with a short pause so it is readable. */
     public void showLoading() {
         System.out.println("Loading tasks ...");
         try {
@@ -47,15 +57,27 @@ public class Ui {
         }
     }
 
+    /** Tells the user nothing was loaded from the save file. */
     public void showNoTasks() {
         System.out.println("\nNo tasks found.");
         System.out.println(LINE_BREAK);
     }
 
+    /**
+     * Prints the whole task list.
+     *
+     * @param items the list to print
+     */
     public void showList(taskList items) {
         System.out.println(items);
     }
 
+    /**
+     * Confirms that a task was added.
+     *
+     * @param t the task that was added
+     * @param count how many tasks there are now
+     */
     public void showAdded(task t, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Got it. I've added this task:");
@@ -64,6 +86,12 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
+    /**
+     * Confirms that a task was deleted.
+     *
+     * @param t the task that was removed
+     * @param count how many tasks are left
+     */
     public void showRemoved(task t, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Noted. I've removed this task:");
@@ -72,6 +100,12 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
+    /**
+     * Confirms that a task was marked done or not done.
+     *
+     * @param t the task that changed
+     * @param isDone true if it was marked done, false if unmarked
+     */
     public void showMarked(task t, boolean isDone) {
         System.out.println(LINE_BREAK);
         System.out.println(isDone
@@ -81,13 +115,18 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
-    //every error message comes out looking the same
+    /**
+     * Prints an error, so every error message comes out looking the same.
+     *
+     * @param message the text to show the user
+     */
     public void showError(String message) {
         System.out.println(LINE_BREAK);
         System.out.println(message);
         System.out.println(LINE_BREAK);
     }
 
+    /** Prints the sign-off shown when the user types bye. */
     public void showGoodbye() {
         System.out.println("\nBYEEEEEEE!");
         System.out.println(LINE_BREAK);
