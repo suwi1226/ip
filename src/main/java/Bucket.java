@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -54,16 +56,28 @@ public class Bucket {
 
             } else if (command.equals("deadline")) {
                 //add deadline
-                // "return book /by Sunday" -> ["return book", "Sunday"]
+                // "return book /by 2019-10-15" -> ["return book", "2019-10-15"]
                 String[] detail = argument.split(" /by ", 2); //split into description and deadline
-                addTask(items, new deadline(detail[0], detail[1]));
+                try {
+                    addTask(items, new deadline(detail[0], LocalDate.parse(detail[1])));
+                } catch (DateTimeParseException e) {
+                    System.out.println(LINE_BREAK);
+                    System.out.println("OOPS!!! Dates need to look like 2019-10-15.");
+                    System.out.println(LINE_BREAK);
+                }
 
             } else if (command.equals("event")) {
                 //add event
-                // "project meeting /from Mon 2pm /to 4pm" -> description, then start, then end
+                // "project meeting /from 2019-10-15 /to 2019-10-16" -> description, then start, then end
                 String[] detail = argument.split(" /from ", 2); //spilts into description and the rest
                 String[] fromTo = detail[1].split(" /to ", 2); //splits the rest into start and end
-                addTask(items, new event(detail[0], fromTo[0], fromTo[1]));
+                try {
+                    addTask(items, new event(detail[0], LocalDate.parse(fromTo[0]), LocalDate.parse(fromTo[1])));
+                } catch (DateTimeParseException e) {
+                    System.out.println(LINE_BREAK);
+                    System.out.println("OOPS!!! Dates need to look like 2019-10-15.");
+                    System.out.println(LINE_BREAK);
+                }
 
             } else if (command.equals("mark") || command.equals("unmark")) {
                 //mark or unmark a task
