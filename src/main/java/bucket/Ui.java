@@ -52,11 +52,11 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
-    public void showList(taskList items) {
+    public void showList(TaskList items) {
         System.out.println(items);
     }
 
-    public void showAdded(task t, int count) {
+    public void showAdded(Task t, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Got it. I've added this task:");
         System.out.println("    " + t);
@@ -64,7 +64,7 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
-    public void showRemoved(task t, int count) {
+    public void showRemoved(Task t, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Noted. I've removed this task:");
         System.out.println("    " + t);
@@ -72,7 +72,7 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
-    public void showMarked(task t, boolean isDone) {
+    public void showMarked(Task t, boolean isDone) {
         System.out.println(LINE_BREAK);
         System.out.println(isDone
                 ? "Nice! I've marked this task as done:"

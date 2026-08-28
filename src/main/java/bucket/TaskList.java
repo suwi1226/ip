@@ -2,10 +2,10 @@ package bucket;
 
 import java.util.ArrayList;
 
-public class taskList {
-    private ArrayList<task> items = new ArrayList<>();
+public class TaskList {
+    private ArrayList<Task> items = new ArrayList<>();
 
-    public void addItem(task item) {
+    public void addItem(Task item) {
         items.add(item);
     }
 
@@ -13,7 +13,7 @@ public class taskList {
         items.remove(index);
     }
 
-    public task get(int index) {
+    public Task get(int index) {
         return items.get(index);
     }
 

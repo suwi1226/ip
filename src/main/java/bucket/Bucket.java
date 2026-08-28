@@ -9,7 +9,7 @@ public class Bucket {
         ui.showWelcome();
 
         //load whatever was saved last time
-        taskList items = Storage.load();
+        TaskList items = Storage.load();
         ui.showLoading();
 
         if (items.isEmpty()) {
@@ -30,7 +30,7 @@ public class Bucket {
                 if (argument.isEmpty()) {
                     ui.showError("OOPS!!! The description of a todo cannot be empty.");
                 } else {
-                    addTask(items, new todo(argument), ui);
+                    addTask(items, new Todo(argument), ui);
                 }
 
             } else if (command.equals("deadline")) {
@@ -52,7 +52,7 @@ public class Bucket {
             } else if (command.equals("mark") || command.equals("unmark")) {
                 //mark or unmark a task
                 boolean isDone = command.equals("mark");
-                task t = items.get(Parser.toIndex(argument));
+                Task t = items.get(Parser.toIndex(argument));
                 t.setDone(isDone);
                 ui.showMarked(t, isDone);
 
@@ -63,7 +63,7 @@ public class Bucket {
             } else if (command.equals("delete")) {
                 //delete a task
                 int index = Parser.toIndex(argument);
-                task t = items.get(index);
+                Task t = items.get(index);
                 items.removeItem(index);
                 ui.showRemoved(t, items.size());
 
@@ -83,7 +83,7 @@ public class Bucket {
     }
 
     //adds a task to the list and tells the user about it
-    private static void addTask(taskList items, task t, Ui ui) {
+    private static void addTask(TaskList items, Task t, Ui ui) {
         items.addItem(t);
         ui.showAdded(t, items.size());
     }

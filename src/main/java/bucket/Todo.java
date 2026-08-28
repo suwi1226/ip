@@ -1,7 +1,7 @@
 package bucket;
 
-public class todo extends task {
-    public todo(String name) {
+public class Todo extends Task {
+    public Todo(String name) {
         super(name);
     }
 

@@ -2,16 +2,16 @@ package bucket;
 
 //abstract class for all tasks - todo, event, deadline
 
-public abstract class task {
+public abstract class Task {
     private boolean isDone;
     private String name;
 
-    public task(String name) {
+    public Task(String name) {
         this.isDone = false;
         this.name = name;
     }
 
-    public String doneString() {
+    public String getDoneIcon() {
         return (isDone ? "X" : " ");
     }
 
@@ -32,6 +32,6 @@ public abstract class task {
 
     @Override
     public String toString() {
-        return String.format("[%s][%s] %s", getTypeIcon(), doneString(), this.name);
+        return String.format("[%s][%s] %s", getTypeIcon(), getDoneIcon(), this.name);
     }
 }

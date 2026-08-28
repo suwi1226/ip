@@ -26,16 +26,16 @@ public class Parser {
     }
 
     //"return book /by 2019-10-15" -> a deadline
-    public static deadline toDeadline(String argument) {
+    public static Deadline toDeadline(String argument) {
         String[] detail = argument.split(" /by ", 2); //split into description and date
-        return new deadline(detail[0], LocalDate.parse(detail[1]));
+        return new Deadline(detail[0], LocalDate.parse(detail[1]));
     }
 
     //"project meeting /from 2019-10-15 /to 2019-10-16" -> an event
-    public static event toEvent(String argument) {
+    public static Event toEvent(String argument) {
         String[] detail = argument.split(" /from ", 2); //splits into description and the rest
         String[] fromTo = detail[1].split(" /to ", 2); //splits the rest into start and end
-        return new event(detail[0], LocalDate.parse(fromTo[0]), LocalDate.parse(fromTo[1]));
+        return new Event(detail[0], LocalDate.parse(fromTo[0]), LocalDate.parse(fromTo[1]));
     }
 
     //"2" -> 1, because the list is shown 1-based but stored 0-based

@@ -15,7 +15,7 @@ public class ParserTest {
     //as plain yyyy-mm-dd - so a wrong date can't hide behind the display format
     @Test
     public void toEvent_validInput_allThreePartsParsed() {
-        event e = Parser.toEvent("project meeting /from 2019-10-15 /to 2019-10-16");
+        Event e = Parser.toEvent("project meeting /from 2019-10-15 /to 2019-10-16");
         assertEquals("E | 0 | project meeting | 2019-10-15 | 2019-10-16", e.toSaveString());
     }
 
@@ -23,7 +23,7 @@ public class ParserTest {
     //and the /from and /to markers must not be swallowed into it
     @Test
     public void toEvent_descriptionWithManySpaces_keptWhole() {
-        event e = Parser.toEvent("team lunch at the new place /from 2020-01-01 /to 2020-01-02");
+        Event e = Parser.toEvent("team lunch at the new place /from 2020-01-01 /to 2020-01-02");
         assertEquals("E | 0 | team lunch at the new place | 2020-01-01 | 2020-01-02", e.toSaveString());
     }
 

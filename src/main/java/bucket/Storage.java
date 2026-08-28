@@ -15,7 +15,7 @@ public class Storage {
     private static final Path FILE_PATH = Path.of("data", "bucket.txt");
 
     //writes every task to the file, one per line
-    public static void save(taskList items) {
+    public static void save(TaskList items) {
         try {
             //the folder has to exist first - Files.write won't make it.
             //the file itself doesn't need checking, Files.write creates it if it's missing
@@ -33,8 +33,8 @@ public class Storage {
     }
 
     //reads the file bucket.txt back into a taskList, or an empty one if there's nothing saved
-    public static taskList load() {
-        taskList items = new taskList();
+    public static TaskList load() {
+        TaskList items = new TaskList();
 
         //first run - the file isn't there yet - return an empty list
         if (!Files.exists(FILE_PATH)) {
@@ -55,7 +55,7 @@ public class Storage {
                 }
 
                 //parse gives back null for a corrupted line, so that line just gets skipped
-                task t = parse(line);
+                Task t = parse(line);
                 if (t != null) {
                     items.addItem(t);
                 }
@@ -69,7 +69,7 @@ public class Storage {
     }
 
     //turns one line like "D | 0 | return book | June 6th" back into a task
-    private static task parse(String line) {
+    private static Task parse(String line) {
         //the | has to be escaped because split takes a regex, where | means "or"
         String[] values = line.split(" \\| ");
 
@@ -82,14 +82,14 @@ public class Storage {
         String name = values[2];
 
         //each type has its own number of values, so a wrong count means it's corrupted
-        task t = null;
+        Task t = null;
         try {
             if (type.equals("T") && values.length == 3) {
-                t = new todo(name);
+                t = new Todo(name);
             } else if (type.equals("D") && values.length == 4) {
-                t = new deadline(name, LocalDate.parse(values[3]));
+                t = new Deadline(name, LocalDate.parse(values[3]));
             } else if (type.equals("E") && values.length == 5) {
-                t = new event(name, LocalDate.parse(values[3]), LocalDate.parse(values[4]));
+                t = new Event(name, LocalDate.parse(values[3]), LocalDate.parse(values[4]));
             }
         } catch (DateTimeParseException e) {
             //the saved date isn't a real date, so the whole line counts as corrupted
