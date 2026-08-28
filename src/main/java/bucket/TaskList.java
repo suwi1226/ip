@@ -53,6 +53,24 @@ public class TaskList {
     }
 
     /**
+     * Returns the tasks whose description contains the given keyword.
+     * Matching ignores case, so "BOOK" finds "read book".
+     *
+     * @param keyword Text to look for in each task description.
+     * @return New list holding only the matching tasks, in their original order.
+     */
+    public TaskList find(String keyword) {
+        TaskList matches = new TaskList();
+        String needle = keyword.toLowerCase();
+        for (Task task : items) {
+            if (task.getName().toLowerCase().contains(needle)) {
+                matches.addItem(task);
+            }
+        }
+        return matches;
+    }
+
+    /**
      * Returns the whole list numbered from 1, ready to print.
      *
      * @return Display form of the list.

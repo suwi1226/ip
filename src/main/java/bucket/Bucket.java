@@ -66,6 +66,13 @@ public class Bucket {
             } else if (command.equals("list")) {
                 ui.showList(items);
 
+            } else if (command.equals("find")) {
+                if (argument.isEmpty()) {
+                    ui.showError("OOPS!!! Tell me what to search for, e.g. find book.");
+                } else {
+                    ui.showFound(items.find(argument));
+                }
+
             } else if (command.equals("delete")) {
                 int index = Parser.toIndex(argument);
                 Task task = items.get(index);

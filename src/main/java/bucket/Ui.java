@@ -126,6 +126,25 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
+    /**
+     * Prints the tasks that matched a find, numbered from 1.
+     * The numbering restarts at 1, so it does not line up with the full list.
+     *
+     * @param matches Tasks that matched the keyword.
+     */
+    public void showFound(TaskList matches) {
+        System.out.println(LINE_BREAK);
+        if (matches.isEmpty()) {
+            System.out.println("No matching tasks found.");
+        } else {
+            System.out.println("Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.size(); i++) {
+                System.out.println((i + 1) + "." + matches.get(i));
+            }
+        }
+        System.out.println(LINE_BREAK);
+    }
+
     /** Prints the sign-off shown when the user types bye. */
     public void showGoodbye() {
         System.out.println("\nBYEEEEEEE!");
