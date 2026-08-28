@@ -1,9 +1,14 @@
-/** A task spanning a start and end time, e.g. "project meeting (from: Mon 2pm to: 4pm)". */
-public class event extends task {
-    private String from;
-    private String to;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-    public event(String name, String from, String to) {
+public class event extends task {
+    //how the dates are shown to the user - the save file uses plain yyyy-mm-dd instead
+    private static final DateTimeFormatter DISPLAY = DateTimeFormatter.ofPattern("MMM dd yyyy");
+
+    private LocalDate from;
+    private LocalDate to;
+
+    public event(String name, LocalDate from, LocalDate to) {
         super(name);
         this.from = from;
         this.to = to;
@@ -21,6 +26,7 @@ public class event extends task {
 
     @Override
     public String toString() {
-        return super.toString() + " (from: " + this.from + " to: " + this.to + ")";
+        return super.toString() + " (from: " + this.from.format(DISPLAY)
+                + " to: " + this.to.format(DISPLAY) + ")";
     }
 }

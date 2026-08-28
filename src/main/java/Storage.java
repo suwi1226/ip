@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,12 +81,17 @@ public class Storage {
 
         //each type has its own number of values, so a wrong count means it's corrupted
         task t = null;
-        if (type.equals("T") && values.length == 3) {
-            t = new todo(name);
-        } else if (type.equals("D") && values.length == 4) {
-            t = new deadline(name, values[3]);
-        } else if (type.equals("E") && values.length == 5) {
-            t = new event(name, values[3], values[4]);
+        try {
+            if (type.equals("T") && values.length == 3) {
+                t = new todo(name);
+            } else if (type.equals("D") && values.length == 4) {
+                t = new deadline(name, LocalDate.parse(values[3]));
+            } else if (type.equals("E") && values.length == 5) {
+                t = new event(name, LocalDate.parse(values[3]), LocalDate.parse(values[4]));
+            }
+        } catch (DateTimeParseException e) {
+            //the saved date isn't a real date, so the whole line counts as corrupted
+            return null;
         }
 
         if (t != null) {
