@@ -19,6 +19,10 @@ public class taskList {
         return items.size();
     }
 
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

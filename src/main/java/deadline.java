@@ -13,6 +13,11 @@ public class deadline extends task {
     }
 
     @Override
+    public String toSaveString() {
+        return super.toSaveString() + " | " + this.by;
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " (by: " + this.by + ")";
     }
