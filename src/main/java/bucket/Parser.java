@@ -1,3 +1,5 @@
+package bucket;
+
 import java.time.LocalDate;
 
 //splits the line the user typed into the command word and its argument,

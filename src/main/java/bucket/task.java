@@ -1,3 +1,5 @@
+package bucket;
+
 //abstract class for all tasks - todo, event, deadline
 
 public abstract class task {
