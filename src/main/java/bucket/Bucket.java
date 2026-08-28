@@ -2,7 +2,18 @@ package bucket;
 
 import java.time.format.DateTimeParseException;
 
+/**
+ * Entry point for the Bucket chatbot.
+ * Wires together the Ui, the Parser and the Storage, and runs the command loop
+ * until the user types bye.
+ */
 public class Bucket {
+
+    /**
+     * Starts the chatbot.
+     *
+     * @param args not used
+     */
     public static void main(String[] args) {
         Ui ui = new Ui();
         ui.start();
@@ -82,7 +93,13 @@ public class Bucket {
         ui.showGoodbye();
     }
 
-    //adds a task to the list and tells the user about it
+    /**
+     * Adds a task to the list and tells the user about it.
+     *
+     * @param items the list to add to
+     * @param t the task being added
+     * @param ui used to print the confirmation
+     */
     private static void addTask(taskList items, task t, Ui ui) {
         items.addItem(t);
         ui.showAdded(t, items.size());
