@@ -88,6 +88,20 @@ public class Ui {
         System.out.println(LINE_BREAK);
     }
 
+    //prints the tasks that matched a find, numbered from 1
+    public void showFound(taskList matches) {
+        System.out.println(LINE_BREAK);
+        if (matches.isEmpty()) {
+            System.out.println("No matching tasks found.");
+        } else {
+            System.out.println("Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.size(); i++) {
+                System.out.println((i + 1) + "." + matches.get(i));
+            }
+        }
+        System.out.println(LINE_BREAK);
+    }
+
     public void showGoodbye() {
         System.out.println("\nBYEEEEEEE!");
         System.out.println(LINE_BREAK);

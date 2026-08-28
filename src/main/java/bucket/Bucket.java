@@ -60,6 +60,14 @@ public class Bucket {
                 //list all tasks
                 ui.showList(items);
 
+            } else if (command.equals("find")) {
+                //find tasks matching a keyword
+                if (argument.isEmpty()) {
+                    ui.showError("OOPS!!! Tell me what to search for, e.g. find book.");
+                } else {
+                    ui.showFound(items.find(argument));
+                }
+
             } else if (command.equals("delete")) {
                 //delete a task
                 int index = Parser.toIndex(argument);

@@ -25,6 +25,18 @@ public class taskList {
         return items.isEmpty();
     }
 
+    //returns the tasks whose description contains the keyword, ignoring case
+    public taskList find(String keyword) {
+        taskList matches = new taskList();
+        String needle = keyword.toLowerCase();
+        for (task t : items) {
+            if (t.getName().toLowerCase().contains(needle)) {
+                matches.addItem(t);
+            }
+        }
+        return matches;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
