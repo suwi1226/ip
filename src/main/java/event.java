@@ -15,6 +15,11 @@ public class event extends task {
     }
 
     @Override
+    public String toSaveString() {
+        return super.toSaveString() + " | " + this.from + " | " + this.to;
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " (from: " + this.from + " to: " + this.to + ")";
     }

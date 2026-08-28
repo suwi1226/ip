@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Bucket {
     private static final String LINE_BREAK = "-------------------------";
@@ -9,12 +10,28 @@ public class Bucket {
                 + "|  _ \\ | | | || |    | ' / |  _|    | |  \n"
                 + "| |_) || |_| || |___ | . \\ | |___   | |  \n"
                 + "|____/  \\___/  \\____||_|\\_\\|_____|  |_|  \n";
-        taskList items = new taskList();
-
         System.out.println(LINE_BREAK);
         System.out.println(banner);
         System.out.println("Hello! I'm Bucket\nYou again?");
         System.out.println(LINE_BREAK);
+
+        //load whatever was saved last time
+        taskList items = Storage.load();
+        System.out.println("Loading tasks ...");
+        
+        //time delay
+        try {
+            TimeUnit.MILLISECONDS.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        if (items.isEmpty()) {
+            System.out.println("\nNo tasks found.");
+            System.out.println(LINE_BREAK);
+        } else {
+            System.out.println(items);
+        }
 
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
@@ -83,11 +100,14 @@ public class Bucket {
                 System.out.println(LINE_BREAK);
             }
 
+            //the list might have changed, so write it out again
+            Storage.save(items);
+
             input = scanner.nextLine();
         }
 
         scanner.close();
-        System.out.println("BYE!");
+        System.out.println("\nBYEEEEEEE!");
         System.out.println(LINE_BREAK);
     }
 
