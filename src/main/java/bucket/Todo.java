@@ -1,22 +1,17 @@
 package bucket;
 
 /** A task with no date attached, e.g. "borrow book". */
-public class todo extends task {
+public class Todo extends Task {
 
     /**
      * Creates a todo.
      *
-     * @param name the description the user typed
+     * @param name Description the user typed.
      */
-    public todo(String name) {
+    public Todo(String name) {
         super(name);
     }
 
-    /**
-     * Returns the letter used for todos.
-     *
-     * @return "T"
-     */
     @Override
     public String getTypeIcon() {
         return "T";

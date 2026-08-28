@@ -12,15 +12,15 @@ public class Bucket {
     /**
      * Starts the chatbot.
      *
-     * @param args not used
+     * @param args Not used.
      */
     public static void main(String[] args) {
         Ui ui = new Ui();
         ui.start();
         ui.showWelcome();
 
-        //load whatever was saved last time
-        taskList items = Storage.load();
+        // Load whatever was saved last time
+        TaskList items = Storage.load();
         ui.showLoading();
 
         if (items.isEmpty()) {
@@ -33,19 +33,17 @@ public class Bucket {
 
         while (!input.equalsIgnoreCase("bye")) {
             Parser parser = new Parser(input);
-            String command = parser.getCommand(); //todo, event, deadline, mark, unmark, list, delete
-            String argument = parser.getArgument(); //the rest of the line, if any
+            String command = parser.getCommand(); // todo, event, deadline, mark, unmark, list, delete
+            String argument = parser.getArgument(); // The rest of the line, if any
 
             if (command.equals("todo")) {
-                //add todo
                 if (argument.isEmpty()) {
                     ui.showError("OOPS!!! The description of a todo cannot be empty.");
                 } else {
-                    addTask(items, new todo(argument), ui);
+                    addTask(items, new Todo(argument), ui);
                 }
 
             } else if (command.equals("deadline")) {
-                //add deadline
                 try {
                     addTask(items, Parser.toDeadline(argument), ui);
                 } catch (DateTimeParseException e) {
@@ -53,7 +51,6 @@ public class Bucket {
                 }
 
             } else if (command.equals("event")) {
-                //add event
                 try {
                     addTask(items, Parser.toEvent(argument), ui);
                 } catch (DateTimeParseException e) {
@@ -61,29 +58,25 @@ public class Bucket {
                 }
 
             } else if (command.equals("mark") || command.equals("unmark")) {
-                //mark or unmark a task
                 boolean isDone = command.equals("mark");
-                task t = items.get(Parser.toIndex(argument));
-                t.setDone(isDone);
-                ui.showMarked(t, isDone);
+                Task task = items.get(Parser.toIndex(argument));
+                task.setDone(isDone);
+                ui.showMarked(task, isDone);
 
             } else if (command.equals("list")) {
-                //list all tasks
                 ui.showList(items);
 
             } else if (command.equals("delete")) {
-                //delete a task
                 int index = Parser.toIndex(argument);
-                task t = items.get(index);
+                Task task = items.get(index);
                 items.removeItem(index);
-                ui.showRemoved(t, items.size());
+                ui.showRemoved(task, items.size());
 
             } else {
-                //unknown command
                 ui.showError("OOPS!!! I'm sorry, but I don't know what that means :-(");
             }
 
-            //the list might have changed, so write it out again
+            // The list might have changed, so write it out again
             Storage.save(items);
 
             input = ui.readCommand();
@@ -96,12 +89,12 @@ public class Bucket {
     /**
      * Adds a task to the list and tells the user about it.
      *
-     * @param items the list to add to
-     * @param t the task being added
-     * @param ui used to print the confirmation
+     * @param items List to add to.
+     * @param task Task being added.
+     * @param ui Used to print the confirmation.
      */
-    private static void addTask(taskList items, task t, Ui ui) {
-        items.addItem(t);
-        ui.showAdded(t, items.size());
+    private static void addTask(TaskList items, Task task, Ui ui) {
+        items.addItem(task);
+        ui.showAdded(task, items.size());
     }
 }

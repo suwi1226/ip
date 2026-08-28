@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /** A task that must be done before a given date, e.g. "return book (by: Oct 15 2019)". */
-public class deadline extends task {
-    //how the date is shown to the user - the save file uses plain yyyy-mm-dd instead
+public class Deadline extends Task {
+    /** How the date is shown to the user; the save file uses plain yyyy-mm-dd instead */
     private static final DateTimeFormatter DISPLAY = DateTimeFormatter.ofPattern("MMM dd yyyy");
 
     private LocalDate by;
@@ -13,19 +13,14 @@ public class deadline extends task {
     /**
      * Creates a deadline.
      *
-     * @param name the description the user typed
-     * @param by the date the task is due
+     * @param name Description the user typed.
+     * @param by Date the task is due.
      */
-    public deadline(String name, LocalDate by) {
+    public Deadline(String name, LocalDate by) {
         super(name);
         this.by = by;
     }
 
-    /**
-     * Returns the letter used for deadlines.
-     *
-     * @return "D"
-     */
     @Override
     public String getTypeIcon() {
         return "D";
@@ -35,7 +30,7 @@ public class deadline extends task {
      * Returns the save-file line with the due date appended in yyyy-mm-dd form,
      * which is what LocalDate.parse reads back.
      *
-     * @return the save-file form of this deadline
+     * @return Save-file form of this deadline.
      */
     @Override
     public String toSaveString() {
@@ -45,7 +40,7 @@ public class deadline extends task {
     /**
      * Returns the display form with the due date in MMM dd yyyy form.
      *
-     * @return the display form of this deadline
+     * @return Display form of this deadline.
      */
     @Override
     public String toString() {

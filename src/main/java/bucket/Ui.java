@@ -28,7 +28,7 @@ public class Ui {
     /**
      * Reads the next line the user types.
      *
-     * @return the raw line, before any parsing
+     * @return Raw line, before any parsing.
      */
     public String readCommand() {
         return scanner.nextLine();
@@ -66,22 +66,22 @@ public class Ui {
     /**
      * Prints the whole task list.
      *
-     * @param items the list to print
+     * @param items List to print.
      */
-    public void showList(taskList items) {
+    public void showList(TaskList items) {
         System.out.println(items);
     }
 
     /**
      * Confirms that a task was added.
      *
-     * @param t the task that was added
-     * @param count how many tasks there are now
+     * @param task Task that was added.
+     * @param count How many tasks there are now.
      */
-    public void showAdded(task t, int count) {
+    public void showAdded(Task task, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Got it. I've added this task:");
-        System.out.println("    " + t);
+        System.out.println("    " + task);
         System.out.println("Now you have " + count + " tasks in the list.");
         System.out.println(LINE_BREAK);
     }
@@ -89,13 +89,13 @@ public class Ui {
     /**
      * Confirms that a task was deleted.
      *
-     * @param t the task that was removed
-     * @param count how many tasks are left
+     * @param task Task that was removed.
+     * @param count How many tasks are left.
      */
-    public void showRemoved(task t, int count) {
+    public void showRemoved(Task task, int count) {
         System.out.println(LINE_BREAK);
         System.out.println("Noted. I've removed this task:");
-        System.out.println("    " + t);
+        System.out.println("    " + task);
         System.out.println("Now you have " + count + " tasks in the list.");
         System.out.println(LINE_BREAK);
     }
@@ -103,22 +103,22 @@ public class Ui {
     /**
      * Confirms that a task was marked done or not done.
      *
-     * @param t the task that changed
-     * @param isDone true if it was marked done, false if unmarked
+     * @param task Task that changed.
+     * @param isDone True if it was marked done, false if unmarked.
      */
-    public void showMarked(task t, boolean isDone) {
+    public void showMarked(Task task, boolean isDone) {
         System.out.println(LINE_BREAK);
         System.out.println(isDone
                 ? "Nice! I've marked this task as done:"
                 : "OK, I've marked this task as not done yet:");
-        System.out.println("  " + t);
+        System.out.println("  " + task);
         System.out.println(LINE_BREAK);
     }
 
     /**
      * Prints an error, so every error message comes out looking the same.
      *
-     * @param message the text to show the user
+     * @param message Text to show the user.
      */
     public void showError(String message) {
         System.out.println(LINE_BREAK);

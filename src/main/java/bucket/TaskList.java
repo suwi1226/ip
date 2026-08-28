@@ -3,22 +3,22 @@ package bucket;
 import java.util.ArrayList;
 
 /** Holds the tasks the user has added, in the order they were added. */
-public class taskList {
-    private ArrayList<task> items = new ArrayList<>();
+public class TaskList {
+    private ArrayList<Task> items = new ArrayList<>();
 
     /**
      * Adds a task to the end of the list.
      *
-     * @param item the task to add
+     * @param item Task to add.
      */
-    public void addItem(task item) {
+    public void addItem(Task item) {
         items.add(item);
     }
 
     /**
      * Removes the task at the given position.
      *
-     * @param index zero-based position of the task to remove
+     * @param index Zero-based position of the task to remove.
      */
     public void removeItem(int index) {
         items.remove(index);
@@ -27,17 +27,17 @@ public class taskList {
     /**
      * Returns the task at the given position.
      *
-     * @param index zero-based position, so "mark 2" means index 1
-     * @return the task at that position
+     * @param index Zero-based position, so "mark 2" means index 1.
+     * @return Task at that position.
      */
-    public task get(int index) {
+    public Task get(int index) {
         return items.get(index);
     }
 
     /**
      * Returns how many tasks are stored.
      *
-     * @return the number of tasks
+     * @return Number of tasks in the list.
      */
     public int size() {
         return items.size();
@@ -46,7 +46,7 @@ public class taskList {
     /**
      * Returns whether there are no tasks.
      *
-     * @return true if the list is empty
+     * @return True if the list is empty.
      */
     public boolean isEmpty() {
         return items.isEmpty();
@@ -55,7 +55,7 @@ public class taskList {
     /**
      * Returns the whole list numbered from 1, ready to print.
      *
-     * @return the display form of the list
+     * @return Display form of the list.
      */
     @Override
     public String toString() {
