@@ -21,3 +21,6 @@ text-ui-test/EXPECTED-UNIX.TXT
 /data/bucket.txt
 
 *.class
+
+# JavaFX tutorial practice project, kept alongside but not part of this project
+/javafx-tut/
