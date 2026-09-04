@@ -71,19 +71,21 @@ public class TaskList {
     }
 
     /**
-     * Returns the whole list numbered from 1, ready to print.
+     * Returns the tasks numbered from 1, one per line.
+     * Headings and dividers are left to Ui, so the same text suits the console
+     * and the GUI without either front end having to strip anything out.
      *
      * @return Display form of the list.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("-------------------------\n");
-        sb.append("Here are the tasks in your list:\n");
         for (int i = 0; i < items.size(); i++) {
-            sb.append(String.format("%d.%s\n", i + 1, items.get(i)));
+            if (i > 0) {
+                sb.append("\n");
+            }
+            sb.append(String.format("%d.%s", i + 1, items.get(i)));
         }
-        sb.append("-------------------------");
         return sb.toString();
     }
 }

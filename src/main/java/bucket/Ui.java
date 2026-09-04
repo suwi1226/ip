@@ -1,14 +1,19 @@
 package bucket;
 
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Handles everything the user sees or types, so no other class needs System.out.
- * Keeping the printing in one place means every message is formatted the same way.
+ * Builds every message the user sees, and reads input when running on the console.
+ *
+ * Each message is returned as text rather than printed. That lets the same wording
+ * serve both front ends: the console loop prints what it gets back, while the GUI
+ * puts it inside a dialog box. Nothing here writes to System.out, so neither front
+ * end is baked in.
  */
 public class Ui {
-    private static final String LINE_BREAK = "-------------------------";
+    /** Divider drawn between console messages; the GUI uses dialog boxes instead. */
+    public static final String LINE_BREAK = "-------------------------";
+
     private static final String BANNER = " ____   _   _   ____  _  __ _____  _____ \n"
             + "| __ ) | | | | / ___|| |/ /| ____||_   _|\n"
             + "|  _ \\ | | | || |    | ' / |  _|    | |  \n"
@@ -19,7 +24,7 @@ public class Ui {
 
     /**
      * Opens the input stream. Call this before reading any commands.
-     * Pairs with close() so the scanner's lifetime is obvious from Bucket.
+     * Only the console front end needs this; the GUI reads from a text field.
      */
     public void start() {
         scanner = new Scanner(System.in);
@@ -39,115 +44,124 @@ public class Ui {
         scanner.close();
     }
 
-    /** Prints the banner and greeting shown at startup. */
-    public void showWelcome() {
-        System.out.println(LINE_BREAK);
-        System.out.println(BANNER);
-        System.out.println("Hello! I'm Bucket\nYou again?");
-        System.out.println(LINE_BREAK);
-    }
-
-    /** Prints the loading message, with a short pause so it is readable. */
-    public void showLoading() {
-        System.out.println("Loading tasks ...");
-        try {
-            TimeUnit.MILLISECONDS.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /** Tells the user nothing was loaded from the save file. */
-    public void showNoTasks() {
-        System.out.println("\nNo tasks found.");
-        System.out.println(LINE_BREAK);
-    }
-
     /**
-     * Prints the whole task list.
+     * Returns the ASCII-art banner.
+     * Console only, since it relies on a fixed-width font to line up.
      *
-     * @param items List to print.
+     * @return Banner art.
      */
-    public void showList(TaskList items) {
-        System.out.println(items);
+    public String getBanner() {
+        return BANNER;
     }
 
     /**
-     * Confirms that a task was added.
+     * Returns the greeting shown at startup.
+     *
+     * @return Greeting text.
+     */
+    public String getWelcome() {
+        return "Hello! I'm Bucket\nYou again?";
+    }
+
+    /**
+     * Returns the message shown while the save file is being read.
+     *
+     * @return Loading text.
+     */
+    public String getLoading() {
+        return "Loading tasks ...";
+    }
+
+    /**
+     * Returns the message shown when the save file held nothing.
+     *
+     * @return Empty-list text.
+     */
+    public String getNoTasks() {
+        return "No tasks found.";
+    }
+
+    /**
+     * Returns the whole task list, numbered from 1.
+     *
+     * @param items List to show.
+     * @return List text, or a note that the list is empty.
+     */
+    public String getList(TaskList items) {
+        if (items.isEmpty()) {
+            return "There is nothing in your list yet.";
+        }
+        return "Here are the tasks in your list:\n" + items;
+    }
+
+    /**
+     * Returns confirmation that a task was added.
      *
      * @param task Task that was added.
      * @param count How many tasks there are now.
+     * @return Confirmation text.
      */
-    public void showAdded(Task task, int count) {
-        System.out.println(LINE_BREAK);
-        System.out.println("Got it. I've added this task:");
-        System.out.println("    " + task);
-        System.out.println("Now you have " + count + " tasks in the list.");
-        System.out.println(LINE_BREAK);
+    public String getAdded(Task task, int count) {
+        return "Got it. I've added this task:\n  " + task
+                + "\nNow you have " + count + " tasks in the list.";
     }
 
     /**
-     * Confirms that a task was deleted.
+     * Returns confirmation that a task was deleted.
      *
      * @param task Task that was removed.
      * @param count How many tasks are left.
+     * @return Confirmation text.
      */
-    public void showRemoved(Task task, int count) {
-        System.out.println(LINE_BREAK);
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("    " + task);
-        System.out.println("Now you have " + count + " tasks in the list.");
-        System.out.println(LINE_BREAK);
+    public String getRemoved(Task task, int count) {
+        return "Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + count + " tasks in the list.";
     }
 
     /**
-     * Confirms that a task was marked done or not done.
+     * Returns confirmation that a task was marked done or not done.
      *
      * @param task Task that changed.
      * @param isDone True if it was marked done, false if unmarked.
+     * @return Confirmation text.
      */
-    public void showMarked(Task task, boolean isDone) {
-        System.out.println(LINE_BREAK);
-        System.out.println(isDone
+    public String getMarked(Task task, boolean isDone) {
+        String heading = isDone
                 ? "Nice! I've marked this task as done:"
-                : "OK, I've marked this task as not done yet:");
-        System.out.println("  " + task);
-        System.out.println(LINE_BREAK);
+                : "OK, I've marked this task as not done yet:";
+        return heading + "\n  " + task;
     }
 
     /**
-     * Prints an error, so every error message comes out looking the same.
+     * Returns an error message, so every error comes out looking the same.
      *
      * @param message Text to show the user.
+     * @return Error text.
      */
-    public void showError(String message) {
-        System.out.println(LINE_BREAK);
-        System.out.println(message);
-        System.out.println(LINE_BREAK);
+    public String getError(String message) {
+        return message;
     }
 
     /**
-     * Prints the tasks that matched a find, numbered from 1.
+     * Returns the tasks that matched a find, numbered from 1.
      * The numbering restarts at 1, so it does not line up with the full list.
      *
      * @param matches Tasks that matched the keyword.
+     * @return Match text, or a note that nothing matched.
      */
-    public void showFound(TaskList matches) {
-        System.out.println(LINE_BREAK);
+    public String getFound(TaskList matches) {
         if (matches.isEmpty()) {
-            System.out.println("No matching tasks found.");
-        } else {
-            System.out.println("Here are the matching tasks in your list:");
-            for (int i = 0; i < matches.size(); i++) {
-                System.out.println((i + 1) + "." + matches.get(i));
-            }
+            return "No matching tasks found.";
         }
-        System.out.println(LINE_BREAK);
+        return "Here are the matching tasks in your list:\n" + matches;
     }
 
-    /** Prints the sign-off shown when the user types bye. */
-    public void showGoodbye() {
-        System.out.println("\nBYEEEEEEE!");
-        System.out.println(LINE_BREAK);
+    /**
+     * Returns the sign-off shown when the user types bye.
+     *
+     * @return Goodbye text.
+     */
+    public String getGoodbye() {
+        return "BYEEEEEEE!";
     }
 }
