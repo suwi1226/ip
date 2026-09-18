@@ -23,6 +23,9 @@ import javafx.scene.layout.HBox;
  * which lets the same FXML be reused for every message.
  */
 public class DialogBox extends HBox {
+    /** A dialog box is always a label beside a picture, which is what flip() reorders. */
+    private static final int EXPECTED_CHILD_COUNT = 2;
+
     @FXML
     private Label dialog;
     @FXML
@@ -35,6 +38,9 @@ public class DialogBox extends HBox {
      * @param img Picture of whoever said it.
      */
     private DialogBox(String text, Image img) {
+        assert text != null : "a dialog box needs text to show";
+        assert img != null : "a dialog box needs a picture to show";
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
@@ -43,6 +49,12 @@ public class DialogBox extends HBox {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // The IOException above is caught rather than rethrown, so a failed load lets
+        // execution continue to the two lines below with both fields still null. These
+        // assertions name the missing fx:id instead of leaving a bare NullPointerException.
+        assert dialog != null : "fx:id \"dialog\" missing from DialogBox.fxml";
+        assert displayPicture != null : "fx:id \"displayPicture\" missing from DialogBox.fxml";
 
         dialog.setText(text);
         displayPicture.setImage(img);
@@ -77,6 +89,11 @@ public class DialogBox extends HBox {
      * Flips the dialog box such that the ImageView is on the left and text on the right.
      */
     private void flip() {
+        // Reversing only distinguishes the two speakers while there are exactly two
+        // children. Adding a third to the FXML would silently change what flip means.
+        assert getChildren().size() == EXPECTED_CHILD_COUNT
+                : "a dialog box holds exactly a label and a picture";
+
         ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
         Collections.reverse(tmp);
         getChildren().setAll(tmp);

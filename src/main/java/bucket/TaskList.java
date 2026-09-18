@@ -2,7 +2,13 @@ package bucket;
 
 import java.util.ArrayList;
 
-/** Holds the tasks the user has added, in the order they were added. */
+/**
+ * Holds the tasks the user has added, in the order they were added.
+ *
+ * The central invariant is that the list never holds a null task. Several callers
+ * dereference what they get back without checking, so the assertions below guard
+ * both ends of that: nothing null goes in, and nothing null comes out.
+ */
 public class TaskList {
     private ArrayList<Task> items = new ArrayList<>();
 
@@ -12,6 +18,8 @@ public class TaskList {
      * @param item Task to add.
      */
     public void addItem(Task item) {
+        // Keeping nulls out here is what lets get() and toString() dereference freely.
+        assert item != null : "the task list must never hold a null task";
         items.add(item);
     }
 
@@ -31,7 +39,14 @@ public class TaskList {
      * @return Task at that position.
      */
     public Task get(int index) {
-        return items.get(index);
+        // No assertion on index. A number the user invented is checked by the list
+        // itself, and Bucket turns the IndexOutOfBoundsException into a message.
+        Task task = items.get(index);
+
+        // This is the other half of the addItem invariant: if nothing null went in,
+        // nothing null can come out, so callers are safe to use it directly.
+        assert task != null : "the task list must never hold a null task";
+        return task;
     }
 
     /**
@@ -60,6 +75,8 @@ public class TaskList {
      * @return New list holding only the matching tasks, in their original order.
      */
     public TaskList find(String keyword) {
+        assert keyword != null : "find() needs a keyword, not null";
+
         TaskList matches = new TaskList();
         String needle = keyword.toLowerCase();
         for (Task task : items) {
@@ -67,6 +84,10 @@ public class TaskList {
                 matches.addItem(task);
             }
         }
+
+        // Filtering can only ever remove tasks. A longer result would mean the loop
+        // added something twice, which the user would see as duplicated search hits.
+        assert matches.size() <= items.size() : "find() must not invent tasks";
         return matches;
     }
 

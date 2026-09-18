@@ -36,11 +36,16 @@ public class Ui {
      * @return Raw line, before any parsing.
      */
     public String readCommand() {
+        // start() creates the scanner, and nothing else assigns it. Reaching this with
+        // a null scanner means the console front end skipped a step in its lifecycle,
+        // which would otherwise surface as a NullPointerException with no hint of why.
+        assert scanner != null : "Ui.start() must be called before readCommand()";
         return scanner.nextLine();
     }
 
     /** Closes the input stream. */
     public void close() {
+        assert scanner != null : "Ui.start() must be called before close()";
         scanner.close();
     }
 
