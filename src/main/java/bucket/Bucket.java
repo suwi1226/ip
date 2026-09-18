@@ -33,6 +33,10 @@ public class Bucket {
         // so it never hands back null. Every method below leans on that by using items
         // without a null check, which makes this the right place to pin the contract.
         assert items != null : "Storage.load() must never return null";
+
+        // The save file keeps whatever order it was written in, so sort once here to
+        // make sure the list shown in the greeting is already in date order.
+        items.sort();
     }
 
     /**
@@ -132,7 +136,7 @@ public class Bucket {
             return markTask(argument, command.equals("mark"));
 
         } else if (command.equals("list")) {
-            return ui.getList(items);
+            return listTasks();
 
         } else if (command.equals("find")) {
             return findTasks(argument);
@@ -178,6 +182,21 @@ public class Bucket {
         assert task.getDoneIcon().equals(isDone ? "X" : " ") : "setDone() did not take effect";
 
         return ui.getMarked(task, isDone);
+    }
+
+    /**
+     * Orders the tasks by date and returns the whole list for display.
+     *
+     * The real list is sorted, not a copy of it. The numbers shown come from each
+     * task's position, and mark and delete look tasks up by that same position, so
+     * sorting only what is displayed would make "mark 2" act on a different task
+     * from the one printed as 2.
+     *
+     * @return List text.
+     */
+    private String listTasks() {
+        items.sort();
+        return ui.getList(items);
     }
 
     /**

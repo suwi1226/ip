@@ -1,6 +1,8 @@
 package bucket;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Holds the tasks the user has added, in the order they were added.
@@ -10,6 +12,14 @@ import java.util.ArrayList;
  * both ends of that: nothing null goes in, and nothing null comes out.
  */
 public class TaskList {
+    /**
+     * Orders tasks by the date each one reports, earliest first.
+     * Undated todos stand in as LocalDate.MAX so they fall to the end, which keeps
+     * the comparator a single expression with no null or empty case to handle.
+     */
+    private static final Comparator<Task> BY_DATE =
+            Comparator.comparing(task -> task.getSortDate().orElse(LocalDate.MAX));
+
     private ArrayList<Task> items = new ArrayList<>();
 
     /**
@@ -89,6 +99,23 @@ public class TaskList {
         // added something twice, which the user would see as duplicated search hits.
         assert matches.size() <= items.size() : "find() must not invent tasks";
         return matches;
+    }
+
+    /**
+     * Orders the tasks by date, earliest first, with undated todos left at the end.
+     *
+     * Tasks sharing a date keep the order they were added in, because List.sort is
+     * a stable sort. That also means the todos, which all compare equal, stay in
+     * insertion order among themselves rather than being shuffled.
+     */
+    public void sort() {
+        int sizeBefore = items.size();
+
+        items.sort(BY_DATE);
+
+        // Sorting rearranges the list and must never add or drop a task, which the
+        // user would see as a task vanishing simply because they typed "list".
+        assert items.size() == sizeBefore : "sorting must not change how many tasks there are";
     }
 
     /**

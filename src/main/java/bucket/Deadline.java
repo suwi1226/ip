@@ -2,6 +2,7 @@ package bucket;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /** A task that must be done before a given date, e.g. "return book (by: Oct 15 2019)". */
 public class Deadline extends Task {
@@ -24,6 +25,17 @@ public class Deadline extends Task {
     @Override
     public String getTypeIcon() {
         return "D";
+    }
+
+    /**
+     * Returns the due date, which is the only date a deadline has and the one
+     * the user is tracking.
+     *
+     * @return Date the task is due.
+     */
+    @Override
+    public Optional<LocalDate> getSortDate() {
+        return Optional.of(this.by);
     }
 
     /**

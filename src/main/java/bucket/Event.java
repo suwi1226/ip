@@ -2,6 +2,7 @@ package bucket;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /** A task spanning a start and end date, e.g. "project meeting (from: Oct 15 2019 to: Oct 16 2019)". */
 public class Event extends Task {
@@ -27,6 +28,18 @@ public class Event extends Task {
     @Override
     public String getTypeIcon() {
         return "E";
+    }
+
+    /**
+     * Returns the start date rather than the end date. An event is looked up by
+     * when it begins, so ordering by start is what puts the next one to attend
+     * at the top.
+     *
+     * @return Date the event starts.
+     */
+    @Override
+    public Optional<LocalDate> getSortDate() {
+        return Optional.of(this.from);
     }
 
     /**
