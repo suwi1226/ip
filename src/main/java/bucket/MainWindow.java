@@ -16,6 +16,11 @@ import javafx.util.Duration;
  *
  * Each field marked FXML is filled in by the loader from the control carrying the
  * matching fx:id in MainWindow.fxml, so this class never builds any controls itself.
+ *
+ * That injection is the weak point worth asserting on. The compiler cannot check
+ * that a Java field and an fx:id in an XML file still agree, so a renamed id leaves
+ * a silently null field that only shows up later as a NullPointerException from
+ * somewhere unrelated.
  */
 public class MainWindow extends AnchorPane {
     /** How long the goodbye stays on screen before the window closes. */
@@ -44,6 +49,13 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
+        // Injection has just finished, so this is the first moment the mismatch above
+        // can be detected, and the named message points straight at the broken fx:id.
+        assert scrollPane != null : "fx:id \"scrollPane\" missing from MainWindow.fxml";
+        assert dialogContainer != null : "fx:id \"dialogContainer\" missing from MainWindow.fxml";
+        assert userInput != null : "fx:id \"userInput\" missing from MainWindow.fxml";
+        assert sendButton != null : "fx:id \"sendButton\" missing from MainWindow.fxml";
+
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
@@ -53,6 +65,8 @@ public class MainWindow extends AnchorPane {
      * @param b Chatbot that answers the user's commands.
      */
     public void setBucket(Bucket b) {
+        assert b != null : "the GUI needs a chatbot to talk to";
+
         bucket = b;
         dialogContainer.getChildren().add(
                 DialogBox.getBucketDialog(bucket.getWelcomeMessage(), bucketImage));
@@ -65,6 +79,11 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        // Main calls setBucket while the FXML is loading, before the stage is shown,
+        // so there is no way for the user to reach this handler beforehand. If that
+        // start-up order is ever rearranged, this fires instead of a bare NPE.
+        assert bucket != null : "setBucket() must run before the user can type";
+
         String input = userInput.getText();
 
         // Enter on an empty box would otherwise add two blank dialog boxes.
@@ -73,9 +92,18 @@ public class MainWindow extends AnchorPane {
         }
 
         String response = bucket.getResponse(input);
+        assert response != null : "getResponse() must return text to put in a dialog box";
+
+        int boxesBefore = dialogContainer.getChildren().size();
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBucketDialog(response, bucketImage));
+
+        // One turn of conversation is always a pair, so the transcript stays readable
+        // as alternating sides rather than drifting out of step.
+        assert dialogContainer.getChildren().size() == boxesBefore + 2
+                : "each exchange must add exactly two dialog boxes";
+
         userInput.clear();
 
         if (Bucket.isExitCommand(input)) {

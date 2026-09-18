@@ -10,6 +10,11 @@ import java.time.format.DateTimeParseException;
  * that a caller decides when to hand over the next line. The console loop below
  * still reads lines in a while loop, while the GUI calls getResponse once per
  * button press, which is the only shape an event-driven front end can use.
+ *
+ * Assertions here record assumptions between this class and its callers. They
+ * deliberately say nothing about what the user typed: bad commands are ordinary
+ * events answered with a message, and assertions are off by default anyway, so
+ * using them to police input would leave it unchecked in a real run.
  */
 public class Bucket {
     private final TaskList items;
@@ -23,6 +28,11 @@ public class Bucket {
     public Bucket() {
         this.ui = new Ui();
         this.items = Storage.load();
+
+        // Storage.load returns an empty list for a missing, empty or unreadable file,
+        // so it never hands back null. Every method below leans on that by using items
+        // without a null check, which makes this the right place to pin the contract.
+        assert items != null : "Storage.load() must never return null";
     }
 
     /**
@@ -33,6 +43,7 @@ public class Bucket {
      * @return True if the line is the bye command.
      */
     public static boolean isExitCommand(String input) {
+        assert input != null : "isExitCommand() needs a line, not null";
         return input.trim().equalsIgnoreCase("bye");
     }
 
@@ -59,12 +70,27 @@ public class Bucket {
      * @return Reply to show the user.
      */
     public String getResponse(String input) {
+        // Both front ends supply a real line: Scanner.nextLine and TextField.getText
+        // never return null. A null here means a third caller broke that contract,
+        // which is a programming error rather than something the user did.
+        assert input != null : "getResponse() needs a line, not null";
+
         Parser parser = new Parser(input);
         String command = parser.getCommand();
         String argument = parser.getArgument();
 
+        // Parser splits with a limit of two and substitutes "" for a missing second
+        // half, so both of these exist for every possible line, including a blank one.
+        assert command != null : "Parser must always yield a command word";
+        assert argument != null : "Parser must always yield an argument, empty if absent";
+
         try {
             String response = execute(command, argument);
+
+            // Every branch of execute returns text. A null would reach the GUI and be
+            // rendered as the word "null" in a dialog box, which is hard to trace back.
+            assert response != null : "every command must produce a reply to show";
+
             Storage.save(items);
             return response;
 
@@ -105,8 +131,14 @@ public class Bucket {
 
         } else if (command.equals("mark") || command.equals("unmark")) {
             boolean isDone = command.equals("mark");
+
+            // No assertion on the index: "mark 99" is the user's mistake, and the
+            // IndexOutOfBoundsException it raises is already answered with a message.
             Task task = items.get(Parser.toIndex(argument));
             task.setDone(isDone);
+
+            // setDone is the only way done state changes, so it must have taken effect.
+            assert task.getDoneIcon().equals(isDone ? "X" : " ") : "setDone() did not take effect";
             return ui.getMarked(task, isDone);
 
         } else if (command.equals("list")) {
@@ -121,7 +153,11 @@ public class Bucket {
         } else if (command.equals("delete")) {
             int index = Parser.toIndex(argument);
             Task task = items.get(index);
+
+            int sizeBefore = items.size();
             items.removeItem(index);
+            assert items.size() == sizeBefore - 1 : "deleting must shrink the list by exactly one";
+
             return ui.getRemoved(task, items.size());
 
         } else if (isExitCommand(command)) {
@@ -139,7 +175,17 @@ public class Bucket {
      * @return Confirmation text.
      */
     private String addTask(Task task) {
+        // Every caller builds this from a constructor or from Parser, all of which
+        // either return a task or throw, so a null means one of them went wrong.
+        assert task != null : "addTask() needs a task, not null";
+
+        int sizeBefore = items.size();
         items.addItem(task);
+
+        // The count in the confirmation message comes straight from size(), so a list
+        // that did not grow would quietly report the wrong number back to the user.
+        assert items.size() == sizeBefore + 1 : "adding must grow the list by exactly one";
+
         return ui.getAdded(task, items.size());
     }
 
@@ -173,6 +219,8 @@ public class Bucket {
      * @param message Text to print.
      */
     private static void printBlock(String message) {
+        assert message != null : "printBlock() needs text, not null";
+
         System.out.println(Ui.LINE_BREAK);
         System.out.println(message);
         System.out.println(Ui.LINE_BREAK);
