@@ -83,6 +83,8 @@ public class Bucket {
 
     /**
      * Picks the right action for a command word and returns its reply.
+     * Every branch is a single call, so this reads as the list of commands Bucket
+     * understands, and how each one works is left to the method it names.
      * Anything malformed is left to throw, so getResponse can turn every failure
      * into a message in one place.
      *
@@ -92,10 +94,7 @@ public class Bucket {
      */
     private String execute(String command, String argument) {
         if (command.equals("todo")) {
-            if (argument.isEmpty()) {
-                return ui.getError("OOPS!!! The description of a todo cannot be empty.");
-            }
-            return addTask(new Todo(argument));
+            return addTodo(argument);
 
         } else if (command.equals("deadline")) {
             return addTask(Parser.toDeadline(argument));
@@ -104,25 +103,16 @@ public class Bucket {
             return addTask(Parser.toEvent(argument));
 
         } else if (command.equals("mark") || command.equals("unmark")) {
-            boolean isDone = command.equals("mark");
-            Task task = items.get(Parser.toIndex(argument));
-            task.setDone(isDone);
-            return ui.getMarked(task, isDone);
+            return markTask(argument, command.equals("mark"));
 
         } else if (command.equals("list")) {
             return ui.getList(items);
 
         } else if (command.equals("find")) {
-            if (argument.isEmpty()) {
-                return ui.getError("OOPS!!! Tell me what to search for, e.g. find book.");
-            }
-            return ui.getFound(items.find(argument));
+            return findTasks(argument);
 
         } else if (command.equals("delete")) {
-            int index = Parser.toIndex(argument);
-            Task task = items.get(index);
-            items.removeItem(index);
-            return ui.getRemoved(task, items.size());
+            return deleteTask(argument);
 
         } else if (isExitCommand(command)) {
             return ui.getGoodbye();
@@ -130,6 +120,58 @@ public class Bucket {
         } else {
             return ui.getError("OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
+    }
+
+    /**
+     * Adds a todo and returns the confirmation for it.
+     *
+     * @param description Text the user typed after the command word.
+     * @return Confirmation text, or an error if the description was missing.
+     */
+    private String addTodo(String description) {
+        if (description.isEmpty()) {
+            return ui.getError("OOPS!!! The description of a todo cannot be empty.");
+        }
+        return addTask(new Todo(description));
+    }
+
+    /**
+     * Marks the task the user picked as done or not done.
+     *
+     * @param argument Task number as the user typed it.
+     * @param isDone True to mark it done, false to mark it not done.
+     * @return Confirmation text.
+     */
+    private String markTask(String argument, boolean isDone) {
+        Task task = items.get(Parser.toIndex(argument));
+        task.setDone(isDone);
+        return ui.getMarked(task, isDone);
+    }
+
+    /**
+     * Returns the tasks whose description contains the keyword.
+     *
+     * @param keyword Text to search descriptions for.
+     * @return Matching tasks, or an error if no keyword was given.
+     */
+    private String findTasks(String keyword) {
+        if (keyword.isEmpty()) {
+            return ui.getError("OOPS!!! Tell me what to search for, e.g. find book.");
+        }
+        return ui.getFound(items.find(keyword));
+    }
+
+    /**
+     * Removes the task the user picked and returns the confirmation for it.
+     *
+     * @param argument Task number as the user typed it.
+     * @return Confirmation text.
+     */
+    private String deleteTask(String argument) {
+        int index = Parser.toIndex(argument);
+        Task task = items.get(index);
+        items.removeItem(index);
+        return ui.getRemoved(task, items.size());
     }
 
     /**
