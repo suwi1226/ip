@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -22,7 +22,7 @@ import javafx.util.Duration;
  * a silently null field that only shows up later as a NullPointerException from
  * somewhere unrelated.
  */
-public class MainWindow extends AnchorPane {
+public class MainWindow extends VBox {
     /** How long the goodbye stays on screen before the window closes. */
     private static final Duration EXIT_DELAY = Duration.seconds(1.5);
 
@@ -34,11 +34,13 @@ public class MainWindow extends AnchorPane {
     private TextField userInput;
     @FXML
     private Button sendButton;
+    @FXML
+    private HBox inputBar;
 
     private Bucket bucket;
 
-    private final Image userImage =
-            new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
+    // Only Bucket has a picture. The user knows who they are, and the width it would
+    // take on every other line is better spent on the task lists Bucket sends back.
     private final Image bucketImage =
             new Image(this.getClass().getResourceAsStream("/images/DaBucket.png"));
 
@@ -55,8 +57,13 @@ public class MainWindow extends AnchorPane {
         assert dialogContainer != null : "fx:id \"dialogContainer\" missing from MainWindow.fxml";
         assert userInput != null : "fx:id \"userInput\" missing from MainWindow.fxml";
         assert sendButton != null : "fx:id \"sendButton\" missing from MainWindow.fxml";
+        assert inputBar != null : "fx:id \"inputBar\" missing from MainWindow.fxml";
 
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+
+        // Typing is the normal thing to do on opening, so start there rather than
+        // making the user click into the box first.
+        Platform.runLater(() -> userInput.requestFocus());
     }
 
     /**
@@ -69,7 +76,7 @@ public class MainWindow extends AnchorPane {
 
         bucket = b;
         dialogContainer.getChildren().add(
-                DialogBox.getBucketDialog(bucket.getWelcomeMessage(), bucketImage));
+                DialogBox.getBucketDialog(Response.of(bucket.getWelcomeMessage()), bucketImage));
     }
 
     /**
@@ -91,12 +98,12 @@ public class MainWindow extends AnchorPane {
             return;
         }
 
-        String response = bucket.getResponse(input);
-        assert response != null : "getResponse() must return text to put in a dialog box";
+        Response response = bucket.getResponse(input);
+        assert response != null : "getResponse() must return a reply to put in a dialog box";
 
         int boxesBefore = dialogContainer.getChildren().size();
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
+                DialogBox.getUserDialog(input),
                 DialogBox.getBucketDialog(response, bucketImage));
 
         // One turn of conversation is always a pair, so the transcript stays readable

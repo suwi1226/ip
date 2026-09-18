@@ -73,7 +73,7 @@ public class Bucket {
      * @param input Raw line the user typed.
      * @return Reply to show the user.
      */
-    public String getResponse(String input) {
+    public Response getResponse(String input) {
         // Both front ends supply a real line: Scanner.nextLine and TextField.getText
         // never return null. A null here means a third caller broke that contract,
         // which is a programming error rather than something the user did.
@@ -89,25 +89,25 @@ public class Bucket {
         assert argument != null : "Parser must always yield an argument, empty if absent";
 
         try {
-            String response = execute(command, argument);
+            Response response = execute(command, argument);
 
-            // Every branch of execute returns text. A null would reach the GUI and be
-            // rendered as the word "null" in a dialog box, which is hard to trace back.
+            // Every branch of execute returns a reply. A null would reach the GUI and
+            // be rendered as the word "null" in a dialog box, which is hard to trace.
             assert response != null : "every command must produce a reply to show";
 
             Storage.save(items);
             return response;
 
         } catch (DateTimeParseException e) {
-            return ui.getError("OOPS!!! Dates need to look like 2019-10-15.");
+            return Response.error(ui.getError("OOPS!!! Dates need to look like 2019-10-15."));
         } catch (ArrayIndexOutOfBoundsException e) {
-            return ui.getError("OOPS!!! That command is missing a part. Try\n"
+            return Response.error(ui.getError("OOPS!!! That command is missing a part. Try\n"
                     + "  deadline return book /by 2019-10-15\n"
-                    + "  event project meeting /from 2019-10-15 /to 2019-10-16");
+                    + "  event project meeting /from 2019-10-15 /to 2019-10-16"));
         } catch (NumberFormatException e) {
-            return ui.getError("OOPS!!! I need a task number, e.g. mark 2.");
+            return Response.error(ui.getError("OOPS!!! I need a task number, e.g. mark 2."));
         } catch (IndexOutOfBoundsException e) {
-            return ui.getError("OOPS!!! There is no task with that number.");
+            return Response.error(ui.getError("OOPS!!! There is no task with that number."));
         }
     }
 
@@ -122,7 +122,7 @@ public class Bucket {
      * @param argument Rest of the line, if any.
      * @return Reply to show the user.
      */
-    private String execute(String command, String argument) {
+    private Response execute(String command, String argument) {
         if (command.equals("todo")) {
             return addTodo(argument);
 
@@ -145,10 +145,11 @@ public class Bucket {
             return deleteTask(argument);
 
         } else if (isExitCommand(command)) {
-            return ui.getGoodbye();
+            return Response.of(ui.getGoodbye());
 
         } else {
-            return ui.getError("OOPS!!! I'm sorry, but I don't know what that means :-(");
+            return Response.error(
+                    ui.getError("OOPS!!! I'm sorry, but I don't know what that means :-("));
         }
     }
 
@@ -158,9 +159,9 @@ public class Bucket {
      * @param description Text the user typed after the command word.
      * @return Confirmation text, or an error if the description was missing.
      */
-    private String addTodo(String description) {
+    private Response addTodo(String description) {
         if (description.isEmpty()) {
-            return ui.getError("OOPS!!! The description of a todo cannot be empty.");
+            return Response.error(ui.getError("OOPS!!! The description of a todo cannot be empty."));
         }
         return addTask(new Todo(description));
     }
@@ -172,7 +173,7 @@ public class Bucket {
      * @param isDone True to mark it done, false to mark it not done.
      * @return Confirmation text.
      */
-    private String markTask(String argument, boolean isDone) {
+    private Response markTask(String argument, boolean isDone) {
         // No assertion on the index: "mark 99" is the user's mistake, and the
         // IndexOutOfBoundsException it raises is already answered with a message.
         Task task = items.get(Parser.toIndex(argument));
@@ -181,7 +182,7 @@ public class Bucket {
         // setDone is the only way done state changes, so it must have taken effect.
         assert task.getDoneIcon().equals(isDone ? "X" : " ") : "setDone() did not take effect";
 
-        return ui.getMarked(task, isDone);
+        return Response.of(ui.getMarked(task, isDone));
     }
 
     /**
@@ -194,9 +195,9 @@ public class Bucket {
      *
      * @return List text.
      */
-    private String listTasks() {
+    private Response listTasks() {
         items.sort();
-        return ui.getList(items);
+        return Response.of(ui.getList(items));
     }
 
     /**
@@ -205,11 +206,11 @@ public class Bucket {
      * @param keyword Text to search descriptions for.
      * @return Matching tasks, or an error if no keyword was given.
      */
-    private String findTasks(String keyword) {
+    private Response findTasks(String keyword) {
         if (keyword.isEmpty()) {
-            return ui.getError("OOPS!!! Tell me what to search for, e.g. find book.");
+            return Response.error(ui.getError("OOPS!!! Tell me what to search for, e.g. find book."));
         }
-        return ui.getFound(items.find(keyword));
+        return Response.of(ui.getFound(items.find(keyword)));
     }
 
     /**
@@ -218,7 +219,7 @@ public class Bucket {
      * @param argument Task number as the user typed it.
      * @return Confirmation text.
      */
-    private String deleteTask(String argument) {
+    private Response deleteTask(String argument) {
         int index = Parser.toIndex(argument);
         Task task = items.get(index);
 
@@ -229,7 +230,7 @@ public class Bucket {
         // that did not shrink would quietly report the wrong number back to the user.
         assert items.size() == sizeBefore - 1 : "deleting must shrink the list by exactly one";
 
-        return ui.getRemoved(task, items.size());
+        return Response.of(ui.getRemoved(task, items.size()));
     }
 
     /**
@@ -238,7 +239,7 @@ public class Bucket {
      * @param task Task being added.
      * @return Confirmation text.
      */
-    private String addTask(Task task) {
+    private Response addTask(Task task) {
         // Every caller builds this from a constructor or from Parser, all of which
         // either return a task or throw, so a null means one of them went wrong.
         assert task != null : "addTask() needs a task, not null";
@@ -250,7 +251,7 @@ public class Bucket {
         // that did not grow would quietly report the wrong number back to the user.
         assert items.size() == sizeBefore + 1 : "adding must grow the list by exactly one";
 
-        return ui.getAdded(task, items.size());
+        return Response.of(ui.getAdded(task, items.size()));
     }
 
     /**
@@ -269,11 +270,13 @@ public class Bucket {
 
         String input = ui.readCommand();
         while (!isExitCommand(input)) {
-            printBlock(bucket.getResponse(input));
+            // The console shows every reply the same way, so it only needs the text.
+            // Highlighting errors differently is something only the GUI does.
+            printBlock(bucket.getResponse(input).text());
             input = ui.readCommand();
         }
 
-        printBlock(bucket.getResponse(input));
+        printBlock(bucket.getResponse(input).text());
         ui.close();
     }
 

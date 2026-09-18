@@ -5,7 +5,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -28,13 +28,21 @@ public class Main extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane ap = fxmlLoader.load();
-            Scene scene = new Scene(ap);
+            VBox root = fxmlLoader.load();
+            Scene scene = new Scene(root);
+
+            // Colours, fonts and spacing all live in one stylesheet, so the look can be
+            // changed without recompiling and the FXML stays about layout alone.
+            scene.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
 
             stage.setScene(scene);
             stage.setTitle("Bucket");
-            stage.setMinHeight(600.0);
-            stage.setMinWidth(400.0);
+
+            // Small enough to tuck into a corner of the screen, since the window is
+            // meant to sit alongside whatever the user is actually working on. The
+            // layout stretches from here, so anything larger works too.
+            stage.setMinHeight(320.0);
+            stage.setMinWidth(300.0);
 
             // The controller is only created while the FXML loads, so the chatbot
             // can only be handed over after that.
