@@ -14,6 +14,11 @@ public abstract class Task {
      * @param name Description the user typed.
      */
     public Task(String name) {
+        // Parser hands back "" rather than null when nothing follows the command word,
+        // so a null name means a caller built a task some other way. toString and
+        // toSaveString both format this field without checking it first.
+        assert name != null : "a task needs a description, empty at worst, never null";
+
         this.isDone = false;
         this.name = name;
     }
@@ -50,6 +55,10 @@ public abstract class Task {
      * @return Save-file form of this task.
      */
     public String toSaveString() {
+        // Storage.parse splits saved lines on " | ", so a description containing that
+        // separator would be read back as a different task, or dropped as corrupted.
+        assert !this.name.contains(" | ") : "a description must not contain the save separator";
+
         return String.format("%s | %d | %s", getTypeIcon(), isDone ? 1 : 0, this.name);
     }
 

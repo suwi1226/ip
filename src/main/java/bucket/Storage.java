@@ -23,6 +23,11 @@ public class Storage {
      * @param items List to write out.
      */
     public static void save(TaskList items) {
+        // Bucket saves after every command, always passing its own field. A null would
+        // mean the chatbot lost its list, and the loop below would throw part way
+        // through, which is the one case that could truncate the save file.
+        assert items != null : "save() needs a task list, not null";
+
         try {
             // The folder has to exist first - Files.write won't make it.
             // The file itself doesn't need checking, Files.write creates it if it's missing
