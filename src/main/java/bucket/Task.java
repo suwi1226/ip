@@ -1,5 +1,8 @@
 package bucket;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 /**
  * Base class for every kind of task - todo, deadline and event.
  * Holds the description and done state that all tasks share.
@@ -47,6 +50,15 @@ public abstract class Task {
      * @return "T", "D" or "E".
      */
     public abstract String getTypeIcon();
+
+    /**
+     * Returns the date this task should be ordered by, or empty if it has none.
+     * Each kind of task decides for itself which of its dates matters, so sorting
+     * never has to ask what type a task is.
+     *
+     * @return Date to sort on, or empty for a task with no date.
+     */
+    public abstract Optional<LocalDate> getSortDate();
 
     /**
      * Returns one line for the save file, like "T | 1 | read book".
