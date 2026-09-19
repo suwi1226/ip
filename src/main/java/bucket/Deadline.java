@@ -2,12 +2,20 @@ package bucket;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 
 /** A task that must be done before a given date, e.g. "return book (by: Oct 15 2019)". */
 public class Deadline extends Task {
-    /** How the date is shown to the user; the save file uses plain yyyy-mm-dd instead */
-    private static final DateTimeFormatter DISPLAY = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    /**
+     * How the date is shown to the user; the save file uses plain yyyy-mm-dd instead.
+     *
+     * The locale is pinned rather than left to the machine. Without it the month name
+     * follows whatever language the operating system is set to, so the same task reads
+     * "Oct 15 2019" here and "10月 15 2019" on a Chinese install.
+     */
+    private static final DateTimeFormatter DISPLAY =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     private LocalDate by;
 

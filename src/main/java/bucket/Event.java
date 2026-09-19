@@ -2,12 +2,19 @@ package bucket;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 
 /** A task spanning a start and end date, e.g. "project meeting (from: Oct 15 2019 to: Oct 16 2019)". */
 public class Event extends Task {
-    /** How the dates are shown to the user; the save file uses plain yyyy-mm-dd instead */
-    private static final DateTimeFormatter DISPLAY = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    /**
+     * How the dates are shown to the user; the save file uses plain yyyy-mm-dd instead.
+     *
+     * The locale is pinned for the same reason as in Deadline: left to the machine,
+     * the month name changes with the operating system's language setting.
+     */
+    private static final DateTimeFormatter DISPLAY =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     private LocalDate from;
     private LocalDate to;

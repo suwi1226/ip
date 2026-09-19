@@ -1,6 +1,9 @@
 package bucket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -112,5 +115,147 @@ public class TaskListTest {
         items.sort();
 
         assertEquals(3, items.size());
+    }
+
+    // ---------- holding tasks ----------
+
+    @Test
+    public void isEmpty_newList_isTrue() {
+        assertTrue(new TaskList().isEmpty());
+    }
+
+    @Test
+    public void isEmpty_afterAdding_isFalse() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read book"));
+        assertFalse(items.isEmpty());
+    }
+
+    @Test
+    public void addItem_severalTasks_keepsInsertionOrder() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("first"));
+        items.addItem(new Todo("second"));
+
+        assertEquals("first,second", namesInOrder(items));
+    }
+
+    @Test
+    public void get_index_returnsTheTaskAtThatPosition() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("first"));
+        items.addItem(new Todo("second"));
+
+        assertEquals("second", items.get(1).getName());
+    }
+
+    // The list itself decides an index is out of range, which is what Bucket
+    // turns into a message rather than letting it reach the user as a crash
+    @Test
+    public void get_indexPastTheEnd_throwsIndexOutOfBounds() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read book"));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> items.get(5));
+    }
+
+    @Test
+    public void get_negativeIndex_throwsIndexOutOfBounds() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read book"));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> items.get(-1));
+    }
+
+    @Test
+    public void get_emptyList_throwsIndexOutOfBounds() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new TaskList().get(0));
+    }
+
+    @Test
+    public void removeItem_middleTask_closesTheGap() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("first"));
+        items.addItem(new Todo("second"));
+        items.addItem(new Todo("third"));
+
+        items.removeItem(1);
+
+        assertEquals("first,third", namesInOrder(items));
+    }
+
+    @Test
+    public void removeItem_indexPastTheEnd_throwsIndexOutOfBounds() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new TaskList().removeItem(0));
+    }
+
+    // ---------- searching ----------
+
+    @Test
+    public void find_keywordInTheMiddle_stillMatches() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read a good book"));
+
+        assertEquals("read a good book", namesInOrder(items.find("good")));
+    }
+
+    @Test
+    public void find_differentCase_stillMatches() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("Read Book"));
+
+        assertEquals("Read Book", namesInOrder(items.find("read book")));
+    }
+
+    @Test
+    public void find_noMatch_returnsEmptyList() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read book"));
+
+        assertTrue(items.find("umbrella").isEmpty());
+    }
+
+    @Test
+    public void find_severalMatches_keepsOriginalOrder() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("book one"));
+        items.addItem(new Todo("magazine"));
+        items.addItem(new Todo("book two"));
+
+        assertEquals("book one,book two", namesInOrder(items.find("book")));
+    }
+
+    // Searching must not disturb the list being searched
+    @Test
+    public void find_always_leavesOriginalListAlone() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("read book"));
+        items.addItem(new Todo("buy milk"));
+
+        items.find("book");
+
+        assertEquals(2, items.size());
+    }
+
+    @Test
+    public void find_emptyList_returnsEmptyList() {
+        assertTrue(new TaskList().find("anything").isEmpty());
+    }
+
+    // ---------- display form ----------
+
+    @Test
+    public void toString_severalTasks_numbersThemFromOne() {
+        TaskList items = new TaskList();
+        items.addItem(new Todo("first"));
+        items.addItem(new Todo("second"));
+
+        assertEquals("1.[T][ ] first\n2.[T][ ] second", items.toString());
+    }
+
+    // No heading and no divider: Ui adds those, so both front ends can differ
+    @Test
+    public void toString_emptyList_isEmptyString() {
+        assertEquals("", new TaskList().toString());
     }
 }

@@ -1,5 +1,6 @@
 package bucket;
 
+import java.nio.file.Path;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -19,15 +20,29 @@ import java.time.format.DateTimeParseException;
 public class Bucket {
     private final TaskList items;
     private final Ui ui;
+    private final Path saveFile;
 
     /**
-     * Creates a chatbot with whatever was saved last time already loaded.
-     * JavaFX needs a no-argument constructor, and there is nothing to configure,
-     * so this is the only one.
+     * Creates a chatbot that reads and writes the usual save file.
+     * JavaFX needs a no-argument constructor, which is what this one is for.
      */
     public Bucket() {
+        this(Storage.getDefaultPath());
+    }
+
+    /**
+     * Creates a chatbot that reads and writes the given save file.
+     * Naming the file makes the chatbot testable: a test can point it at a scratch
+     * file rather than the one belonging to whoever is using the app.
+     *
+     * @param saveFile File to load from and save to.
+     */
+    public Bucket(Path saveFile) {
+        assert saveFile != null : "Bucket needs a save file, not null";
+
         this.ui = new Ui();
-        this.items = Storage.load();
+        this.saveFile = saveFile;
+        this.items = Storage.load(saveFile);
 
         // Storage.load returns an empty list for a missing, empty or unreadable file,
         // so it never hands back null. Every method below leans on that by using items
@@ -95,7 +110,7 @@ public class Bucket {
             // be rendered as the word "null" in a dialog box, which is hard to trace.
             assert response != null : "every command must produce a reply to show";
 
-            Storage.save(items);
+            Storage.save(items, saveFile);
             return response;
 
         } catch (DateTimeParseException e) {
