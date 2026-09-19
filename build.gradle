@@ -42,6 +42,18 @@ dependencies {
 test {
     useJUnitPlatform()
 
+    // Runs the suite as though the machine were set to another language, e.g.
+    //   gradlew test -PtestLocale=zh-CN
+    // Dates are formatted through a locale-sensitive API, so this is how the app is
+    // checked on a Chinese or German install without having one to hand.
+    if (project.hasProperty('testLocale')) {
+        def parts = project.property('testLocale').toString().split('-')
+        jvmArgs "-Duser.language=${parts[0]}"
+        if (parts.length > 1) {
+            jvmArgs "-Duser.country=${parts[1]}"
+        }
+    }
+
     testLogging {
         events 'passed', 'skipped', 'failed'
 

@@ -17,27 +17,52 @@ public class Storage {
     private static final Path FILE_PATH = Path.of("data", "bucket.txt");
 
     /**
+     * Returns the file the app saves to when no other is named.
+     * Exposed so a caller can be pointed somewhere else, which is what lets tests
+     * run against a scratch file instead of the real one.
+     *
+     * @return Default save file.
+     */
+    public static Path getDefaultPath() {
+        return FILE_PATH;
+    }
+
+    /**
      * Writes every task to the file, one per line, creating the data folder
      * on the first run. A failure is reported but does not stop the program.
      *
      * @param items List to write out.
      */
     public static void save(TaskList items) {
+        save(items, FILE_PATH);
+    }
+
+    /**
+     * Writes every task to the given file, one per line.
+     *
+     * The path is a parameter so tests can write to a scratch file of their own
+     * instead of the one the running app uses.
+     *
+     * @param items List to write out.
+     * @param path File to write to.
+     */
+    public static void save(TaskList items, Path path) {
         // Bucket saves after every command, always passing its own field. A null would
         // mean the chatbot lost its list, and the loop below would throw part way
         // through, which is the one case that could truncate the save file.
         assert items != null : "save() needs a task list, not null";
+        assert path != null : "save() needs a file to write to, not null";
 
         try {
             // The folder has to exist first - Files.write won't make it.
             // The file itself doesn't need checking, Files.write creates it if it's missing
-            Files.createDirectories(FILE_PATH.getParent());
+            Files.createDirectories(path.getParent());
 
             ArrayList<String> lines = new ArrayList<>();
             for (int i = 0; i < items.size(); i++) {
                 lines.add(items.get(i).toSaveString());
             }
-            Files.write(FILE_PATH, lines);
+            Files.write(path, lines);
 
         } catch (IOException e) {
             System.out.println("Couldn't save tasks to file - changes will be lost when the program exits.");
@@ -52,15 +77,30 @@ public class Storage {
      * @return Tasks that were saved, or an empty list if there were none.
      */
     public static TaskList load() {
+        return load(FILE_PATH);
+    }
+
+    /**
+     * Reads the given save file back into a task list.
+     *
+     * The path is a parameter so tests can read a scratch file of their own instead
+     * of the one the running app uses.
+     *
+     * @param path File to read from.
+     * @return Tasks that were saved, or an empty list if there were none.
+     */
+    public static TaskList load(Path path) {
+        assert path != null : "load() needs a file to read from, not null";
+
         TaskList items = new TaskList();
 
         // First run - the file isn't there yet - return an empty list
-        if (!Files.exists(FILE_PATH)) {
+        if (!Files.exists(path)) {
             return items;
         }
 
         try {
-            List<String> lines = Files.readAllLines(FILE_PATH);
+            List<String> lines = Files.readAllLines(path);
 
             // File is there but there's nothing in it - return an empty list
             if (lines.isEmpty()) {
